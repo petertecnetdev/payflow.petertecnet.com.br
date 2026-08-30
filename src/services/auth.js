@@ -22,24 +22,14 @@ export async function login(username, password) {
   const { data } = await api.post('/auth/login', { username, password });
   const tokenPayload = data?.token || data;
   const accessToken = tokenPayload?.access_token;
+  const user = tokenPayload?.user || null;
 
   if (!accessToken) {
     throw new Error('A API não retornou um token de acesso válido.');
   }
 
   localStorage.setItem(TOKEN_KEY, accessToken);
-
-  let user = tokenPayload?.user || null;
-  try {
-    const me = await api.get('/auth/me');
-    user = me.data?.user || user;
-  } catch {
-    // O login continua válido mesmo se o carregamento complementar do perfil falhar.
-  }
-
-  if (user) {
-    localStorage.setItem(USER_KEY, JSON.stringify(user));
-  }
+  if (user) localStorage.setItem(USER_KEY, JSON.stringify(user));
 
   return { accessToken, user };
 }
