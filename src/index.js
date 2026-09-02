@@ -9,7 +9,7 @@ import './styles/commercial.css';
 import './styles/brand.css';
 import App from './App';
 
-document.documentElement.style.setProperty('--payflow-logo', `url(${process.env.PUBLIC_URL}/payflow-logo.png)`);
+document.documentElement.style.setProperty('--payflow-logo', `url(${process.env.PUBLIC_URL}/logo.png)`);
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
