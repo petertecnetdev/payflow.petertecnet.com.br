@@ -3,7 +3,8 @@
   height: 46px;
   flex: 0 0 46px;
   border-radius: 0;
-  background: url('/payflow-logo.png') center/contain no-repeat;
+  background: center / contain no-repeat;
+  background-image: var(--payflow-logo);
   color: transparent;
   font-size: 0;
   box-shadow: none;
