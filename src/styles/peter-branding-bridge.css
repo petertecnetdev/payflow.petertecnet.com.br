@@ -1,0 +1,23 @@
+:root {
+  --pf-primary: var(--peter-brand-primary, #20d3b0) !important;
+  --pf-primary2: var(--peter-brand-secondary, #49e3c6) !important;
+  --pf-accent: var(--peter-brand-accent, #59a8ff) !important;
+  --payflow-logo: var(--peter-brand-logo-url, url('/logo.png')) !important;
+}
+
+.pf-button,
+.pf-brand-mark,
+.pf-primary-action {
+  border-color: var(--pf-primary) !important;
+}
+
+.pf-button:not(.pf-button-ghost) {
+  background: var(--peter-brand-gradient, linear-gradient(135deg, var(--pf-primary), var(--pf-primary2))) !important;
+}
+
+.pf-live-dot,
+.pf-sidebar nav button.active,
+.pf-insight,
+.pf-metrics article div {
+  box-shadow: 0 0 0 1px rgba(var(--peter-brand-primary-rgb, 32, 211, 176), .12) !important;
+}
