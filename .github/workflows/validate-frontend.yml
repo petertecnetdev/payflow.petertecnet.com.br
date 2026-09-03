@@ -1,0 +1,24 @@
+name: Validate PayFlow frontend
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [feat/ecosystem-visual-analytics]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install
+      - run: npm test
+        env:
+          CI: true
+      - run: npm run build
+        env:
+          CI: true
