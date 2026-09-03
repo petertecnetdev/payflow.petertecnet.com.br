@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Google, LockFill } from 'react-bootstrap-icons';
+import { Eye, EyeSlash, Google, LockFill } from 'react-bootstrap-icons';
 import { login } from '../services/auth';
 
 function apiErrorMessage(error) {
@@ -15,6 +15,7 @@ export default function LoginPage() {
   const location = useLocation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -70,15 +71,27 @@ export default function LoginPage() {
 
         <label>
           Senha
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="••••••••"
-            autoComplete="current-password"
-            disabled={loading}
-            required
-          />
+          <div className="pf-password-field">
+            <input
+              type={showPassword ? 'text' : 'password'}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              autoComplete="current-password"
+              disabled={loading}
+              required
+            />
+            <button
+              className="pf-password-toggle"
+              type="button"
+              onClick={() => setShowPassword((visible) => !visible)}
+              aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+              aria-pressed={showPassword}
+              title={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+            >
+              {showPassword ? <EyeSlash aria-hidden="true" /> : <Eye aria-hidden="true" />}
+            </button>
+          </div>
         </label>
 
         <button className="pf-button pf-button-full" type="submit" disabled={loading}>
