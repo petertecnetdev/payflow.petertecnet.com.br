@@ -12,6 +12,7 @@ import App from './App';
 import PeterAccountGateway from './components/PeterAccountGateway';
 import { installGlobalImageFallbacks } from './utils/imageFallback';
 import { installPasswordFieldEnhancer } from './utils/passwordFieldEnhancer';
+import { installPeterWhatsappFallback } from './utils/peterWhatsappFallback';
 
 document.documentElement.style.setProperty('--payflow-logo', `url(${process.env.PUBLIC_URL}/logo.png)`);
 
@@ -20,6 +21,7 @@ const APP_SLUG = 'payflow';
 
 installGlobalImageFallbacks();
 installPasswordFieldEnhancer();
+installPeterWhatsappFallback();
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
