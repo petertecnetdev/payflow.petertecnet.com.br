@@ -7,6 +7,7 @@ import './styles/auth-fixes.css';
 import './styles/company-context.css';
 import './styles/commercial.css';
 import './styles/brand.css';
+import './styles/nexus-mobile-nav.css';
 import App from './App';
 import PeterAccountGateway from './components/PeterAccountGateway';
 import { installGlobalImageFallbacks } from './utils/imageFallback';
