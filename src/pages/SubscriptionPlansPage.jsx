@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import api from '../services/api';
+import { buildPeterWhatsappUrl, getPeterWhatsapp } from '../utils/peterWhatsappFallback';
 import '../styles/subscription-plans.css';
 
 const money = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -8,24 +9,47 @@ export default function SubscriptionPlansPage() {
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [salesWhatsapp, setSalesWhatsapp] = useState(null);
 
   useEffect(() => {
     let active = true;
+
     api.get('/v1/apps/payflow/subscription-plans')
       .then(({ data }) => {
         if (active) setPlans(data?.data?.plans || []);
       })
       .catch(() => active && setError('Não foi possível carregar os planos agora.'))
       .finally(() => active && setLoading(false));
+
+    getPeterWhatsapp().then((url) => {
+      if (active) setSalesWhatsapp(url);
+    });
+
     return () => { active = false; };
   }, []);
 
   const choose = (plan) => {
+    const salesUrl = buildPeterWhatsappUrl(salesWhatsapp, [
+      'Olá! Vim pelo PayFlow e quero contratar um plano.',
+      `Plano: ${plan.name} (${plan.code})`,
+      `Valor exibido: ${money.format(plan.price ?? plan.price_cents / 100)}/mês.`,
+      'Pode me orientar para concluir a contratação?'
+    ].join('\n'));
+
     localStorage.setItem('pending_subscription_plan', JSON.stringify({
       application: 'payflow',
       plan: plan.code,
-      selected_at: new Date().toISOString()
+      price_cents: plan.price_cents,
+      currency: plan.currency || 'BRL',
+      selected_at: new Date().toISOString(),
+      source: 'subscription_plans',
+      handoff: salesUrl ? 'whatsapp' : 'app'
     }));
+
+    if (salesUrl) {
+      window.location.assign(salesUrl);
+      return;
+    }
 
     const authenticated = Boolean(localStorage.getItem('petertecnet_token'));
     window.location.assign(authenticated ? `/app?plan=${encodeURIComponent(plan.code)}` : `/login?plan=${encodeURIComponent(plan.code)}`);
@@ -54,7 +78,10 @@ export default function SubscriptionPlansPage() {
             <ul>
               {(plan.features || []).map((feature) => <li key={feature}>{feature}</li>)}
             </ul>
-            <button type="button" onClick={() => choose(plan)}>Escolher {plan.name}</button>
+            <button type="button" onClick={() => choose(plan)}>Solicitar {plan.name}</button>
+            <small className="subscription-plan-handoff">
+              A contratação é concluída com o atendimento comercial. Nenhuma cobrança é feita sem sua confirmação.
+            </small>
           </article>
         ))}
       </section>
