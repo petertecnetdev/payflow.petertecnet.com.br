@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import api from '../services/api';
+import { trackSubscriptionHandoff } from '../services/subscriptionTelemetry';
 import { buildPeterWhatsappUrl, getPeterWhatsapp } from '../utils/peterWhatsappFallback';
 import '../styles/subscription-plans.css';
 
@@ -35,6 +36,7 @@ export default function SubscriptionPlansPage() {
       `Valor exibido: ${money.format(plan.price ?? plan.price_cents / 100)}/mês.`,
       'Pode me orientar para concluir a contratação?'
     ].join('\n'));
+    const handoff = salesUrl ? 'whatsapp' : 'app';
 
     localStorage.setItem('pending_subscription_plan', JSON.stringify({
       application: 'payflow',
@@ -43,8 +45,10 @@ export default function SubscriptionPlansPage() {
       currency: plan.currency || 'BRL',
       selected_at: new Date().toISOString(),
       source: 'subscription_plans',
-      handoff: salesUrl ? 'whatsapp' : 'app'
+      handoff
     }));
+
+    trackSubscriptionHandoff({ plan, handoff });
 
     if (salesUrl) {
       window.location.assign(salesUrl);
