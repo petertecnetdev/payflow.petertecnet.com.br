@@ -29,25 +29,22 @@ export default function SubscriptionPlansPage() {
   }, []);
 
   const choose = (plan) => {
-    const intent = {
+    const salesUrl = buildPeterWhatsappUrl(salesWhatsapp, [
+      'Olá! Vim pelo PayFlow e quero contratar um plano.',
+      `Plano: ${plan.name} (${plan.code})`,
+      `Valor exibido: ${money.format(plan.price ?? plan.price_cents / 100)}/mês.`,
+      'Pode me orientar para concluir a contratação?'
+    ].join('\n'));
+
+    localStorage.setItem('pending_subscription_plan', JSON.stringify({
       application: 'payflow',
       plan: plan.code,
       price_cents: plan.price_cents,
       currency: plan.currency || 'BRL',
       selected_at: new Date().toISOString(),
-      source: 'subscription_plans'
-    };
-
-    localStorage.setItem('pending_subscription_plan', JSON.stringify(intent));
-
-    const price = money.format(plan.price ?? plan.price_cents / 100);
-    const message = [
-      'Olá! Vim pelo PayFlow e quero contratar um plano.',
-      `Plano: ${plan.name} (${plan.code})`,
-      `Valor exibido: ${price}/mês.`,
-      'Pode me orientar para concluir a contratação?'
-    ].join('\n');
-    const salesUrl = buildPeterWhatsappUrl(salesWhatsapp, message);
+      source: 'subscription_plans',
+      handoff: salesUrl ? 'whatsapp' : 'app'
+    }));
 
     if (salesUrl) {
       window.location.assign(salesUrl);
