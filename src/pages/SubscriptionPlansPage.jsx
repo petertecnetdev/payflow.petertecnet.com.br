@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import api from '../services/api';
+import { createSubscriptionIntent } from '../services/subscriptionIntent';
 import { trackSubscriptionHandoff } from '../services/subscriptionTelemetry';
 import { buildPeterWhatsappUrl, getPeterWhatsapp } from '../utils/peterWhatsappFallback';
 import '../styles/subscription-plans.css';
@@ -11,6 +12,7 @@ export default function SubscriptionPlansPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [salesWhatsapp, setSalesWhatsapp] = useState(null);
+  const [submittingPlan, setSubmittingPlan] = useState(null);
 
   useEffect(() => {
     let active = true;
@@ -29,7 +31,10 @@ export default function SubscriptionPlansPage() {
     return () => { active = false; };
   }, []);
 
-  const choose = (plan) => {
+  const choose = async (plan) => {
+    if (submittingPlan) return;
+    setSubmittingPlan(plan.code);
+
     const salesUrl = buildPeterWhatsappUrl(salesWhatsapp, [
       'Olá! Vim pelo PayFlow e quero contratar um plano.',
       `Plano: ${plan.name} (${plan.code})`,
@@ -38,7 +43,7 @@ export default function SubscriptionPlansPage() {
     ].join('\n'));
     const handoff = salesUrl ? 'whatsapp' : 'app';
 
-    localStorage.setItem('pending_subscription_plan', JSON.stringify({
+    const pendingPlan = {
       application: 'payflow',
       plan: plan.code,
       price_cents: plan.price_cents,
@@ -46,7 +51,20 @@ export default function SubscriptionPlansPage() {
       selected_at: new Date().toISOString(),
       source: 'subscription_plans',
       handoff
-    }));
+    };
+
+    localStorage.setItem('pending_subscription_plan', JSON.stringify(pendingPlan));
+
+    const intent = await createSubscriptionIntent({ plan, handoff });
+    if (intent?.id) {
+      localStorage.setItem('pending_subscription_plan', JSON.stringify({
+        ...pendingPlan,
+        intent_id: intent.id,
+        intent_status: intent.status,
+        price_cents: intent.price_cents,
+        currency: intent.currency || pendingPlan.currency
+      }));
+    }
 
     trackSubscriptionHandoff({ plan, handoff });
 
@@ -82,7 +100,9 @@ export default function SubscriptionPlansPage() {
             <ul>
               {(plan.features || []).map((feature) => <li key={feature}>{feature}</li>)}
             </ul>
-            <button type="button" onClick={() => choose(plan)}>Solicitar {plan.name}</button>
+            <button type="button" disabled={Boolean(submittingPlan)} onClick={() => choose(plan)}>
+              {submittingPlan === plan.code ? 'Preparando contratação…' : `Solicitar ${plan.name}`}
+            </button>
             <small className="subscription-plan-handoff">
               A contratação é concluída com o atendimento comercial. Nenhuma cobrança é feita sem sua confirmação.
             </small>
