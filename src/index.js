@@ -9,6 +9,7 @@ import './styles/commercial.css';
 import './styles/brand.css';
 import './styles/nexus-mobile-nav.css';
 import App from './App';
+import GlobalImageInputEnhancer from "./components/GlobalImageInputEnhancer";
 import PeterAccountGateway from './components/PeterAccountGateway';
 import { installGlobalImageFallbacks } from './utils/imageFallback';
 import { installPasswordFieldEnhancer } from './utils/passwordFieldEnhancer';
@@ -29,6 +30,7 @@ root.render(
     <BrowserRouter>
       <PeterAccountGateway apiBaseUrl={API_BASE_URL} appSlug={APP_SLUG}>
         <App />
+        <GlobalImageInputEnhancer />
       </PeterAccountGateway>
     </BrowserRouter>
   </React.StrictMode>
