@@ -6,25 +6,29 @@ import DashboardPage from './pages/DashboardPage';
 import SubscriptionPlansPage from './pages/SubscriptionPlansPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import SeoManager from './components/SeoManager';
+import SkipLink from './components/SkipLink';
 
 export default function App() {
   return (
     <>
       <SeoManager />
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/planos" element={<SubscriptionPlansPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route
-          path="/app"
-          element={(
-            <ProtectedRoute>
-              <DashboardPage />
-            </ProtectedRoute>
-          )}
-        />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+      <SkipLink />
+      <main id="main-content" tabIndex="-1">
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/planos" element={<SubscriptionPlansPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route
+            path="/app"
+            element={(
+              <ProtectedRoute>
+                <DashboardPage />
+              </ProtectedRoute>
+            )}
+          />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </main>
     </>
   );
 }
