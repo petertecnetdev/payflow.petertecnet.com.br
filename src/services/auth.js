@@ -18,8 +18,7 @@ export function getStoredUser() {
   }
 }
 
-export async function login(username, password) {
-  const { data } = await api.post('/auth/login', { username, password });
+function persistTokenResponse(data) {
   const tokenPayload = data?.token || data;
   const accessToken = tokenPayload?.access_token;
   const user = tokenPayload?.user || null;
@@ -32,6 +31,20 @@ export async function login(username, password) {
   if (user) localStorage.setItem(USER_KEY, JSON.stringify(user));
 
   return { accessToken, user };
+}
+
+export async function login(username, password) {
+  const { data } = await api.post('/auth/login', { username, password });
+  return persistTokenResponse(data);
+}
+
+export async function loginWithGoogle(credential) {
+  if (!credential) {
+    throw new Error('O Google não retornou uma credencial válida.');
+  }
+
+  const { data } = await api.post('/auth/google', { token_id: credential });
+  return persistTokenResponse(data);
 }
 
 export async function logout() {

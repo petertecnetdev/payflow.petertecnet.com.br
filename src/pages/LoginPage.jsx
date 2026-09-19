@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Eye, EyeSlash, Google, LockFill } from 'react-bootstrap-icons';
-import { login } from '../services/auth';
+import { GoogleLogin } from '@react-oauth/google';
+import { Eye, EyeSlash, LockFill } from 'react-bootstrap-icons';
+import { login, loginWithGoogle } from '../services/auth';
 
 function apiErrorMessage(error) {
   return error?.response?.data?.error
@@ -18,6 +19,8 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const googleClientId = (process.env.REACT_APP_GOOGLE_CLIENT_ID || '').trim();
+  const destination = location.state?.from || '/app';
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -28,7 +31,22 @@ export default function LoginPage() {
 
     try {
       await login(email.trim(), password);
-      navigate(location.state?.from || '/app', { replace: true });
+      navigate(destination, { replace: true });
+    } catch (requestError) {
+      setError(apiErrorMessage(requestError));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleSuccess = async (response) => {
+    if (loading) return;
+    setError('');
+    setLoading(true);
+
+    try {
+      await loginWithGoogle(response?.credential);
+      navigate(destination, { replace: true });
     } catch (requestError) {
       setError(apiErrorMessage(requestError));
     } finally {
@@ -48,9 +66,22 @@ export default function LoginPage() {
         <h1>Entre no PayFlow</h1>
         <p>Acesse seu comercial digital e acompanhe suas vendas.</p>
 
-        <button className="pf-google" type="button" disabled title="Login Google será habilitado na próxima etapa">
-          <Google /> Continuar com Google
-        </button>
+        {googleClientId ? (
+          <div className="pf-google" aria-busy={loading}>
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={() => setError('Não foi possível autenticar com o Google. Tente novamente.')}
+              text="continue_with"
+              shape="rectangular"
+              width="100%"
+              useOneTap={false}
+            />
+          </div>
+        ) : (
+          <div className="pf-auth-error" role="status">
+            Login com Google temporariamente indisponível. Use e-mail e senha.
+          </div>
+        )}
 
         <div className="pf-divider"><span>ou</span></div>
 
