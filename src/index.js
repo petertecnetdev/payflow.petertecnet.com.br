@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './styles.css';
 import './styles/auth-fixes.css';
@@ -19,19 +20,30 @@ document.documentElement.style.setProperty('--payflow-logo', `url(${process.env.
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://api.petertecnet.com.br/api';
 const APP_SLUG = 'payflow';
+const GOOGLE_CLIENT_ID = (process.env.REACT_APP_GOOGLE_CLIENT_ID || '').trim();
 
 installGlobalImageFallbacks();
 installPasswordFieldEnhancer();
 installPeterWhatsappFallback();
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
-  <React.StrictMode>
+function PayFlowRoot() {
+  const app = (
     <BrowserRouter>
       <PeterAccountGateway apiBaseUrl={API_BASE_URL} appSlug={APP_SLUG}>
         <App />
         <GlobalImageInputEnhancer />
       </PeterAccountGateway>
     </BrowserRouter>
+  );
+
+  return GOOGLE_CLIENT_ID
+    ? <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>{app}</GoogleOAuthProvider>
+    : app;
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(
+  <React.StrictMode>
+    <PayFlowRoot />
   </React.StrictMode>
 );
