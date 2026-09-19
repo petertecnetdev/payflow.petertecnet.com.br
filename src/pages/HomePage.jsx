@@ -18,7 +18,7 @@ export default function HomePage() {
         <Link to="/" className="pf-brand"><span className="pf-brand-mark">P</span><span>Peter <strong>PayFlow</strong></span></Link>
         <div className="pf-nav-actions">
           <Link to="/login" className="pf-link">Entrar</Link>
-          <Link to="/login" className="pf-button pf-button-small">Começar agora</Link>
+          <Link to="/planos" className="pf-button pf-button-small">Ver planos</Link>
         </div>
       </header>
 
@@ -29,7 +29,7 @@ export default function HomePage() {
             <h1>Pare de perder clientes no WhatsApp.</h1>
             <p>O Peter PayFlow atende, qualifica, vende, cobra e acompanha seus clientes automaticamente — enquanto você cuida da sua empresa.</p>
             <div className="pf-hero-actions">
-              <Link to="/login" className="pf-button">Quero vender mais <ArrowRight /></Link>
+              <Link to="/planos" className="pf-button">Conhecer planos <ArrowRight /></Link>
               <a href="#como-funciona" className="pf-button pf-button-ghost">Ver como funciona</a>
             </div>
             <div className="pf-trust"><CheckCircleFill /> Sem ERP complicado. Comece pelo que gera receita.</div>
@@ -57,7 +57,7 @@ export default function HomePage() {
         <section className="pf-section container">
           <div className="pf-panel">
             <div><span className="pf-eyebrow">Programa Fundadores</span><h2>Entre na primeira turma do PayFlow.</h2><p>Implantação assistida e condição especial de lançamento para as primeiras empresas.</p></div>
-            <Link to="/login" className="pf-button">Quero participar <ArrowRight /></Link>
+            <Link to="/planos" className="pf-button">Ver planos <ArrowRight /></Link>
           </div>
         </section>
       </main>
