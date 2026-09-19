@@ -21,7 +21,7 @@ export default function SubscriptionPlansPage() {
       .then(({ data }) => {
         if (active) setPlans(data?.data?.plans || []);
       })
-      .catch(() => active && setError('Não foi possível carregar os planos agora.'))
+      .catch(() => active && setError('Os planos não puderam ser carregados agora. Você ainda pode falar com nosso atendimento para contratar o PayFlow.'))
       .finally(() => active && setLoading(false));
 
     getPeterWhatsapp().then((url) => {
@@ -77,6 +77,20 @@ export default function SubscriptionPlansPage() {
     window.location.assign(authenticated ? `/app?plan=${encodeURIComponent(plan.code)}` : `/login?plan=${encodeURIComponent(plan.code)}`);
   };
 
+  const contactSales = () => {
+    const salesUrl = buildPeterWhatsappUrl(salesWhatsapp, [
+      'Olá! Vim pela página de planos do PayFlow.',
+      'Quero conhecer os planos disponíveis e concluir a contratação.'
+    ].join('\n'));
+
+    trackSubscriptionHandoff({
+      plan: { code: 'plans_unavailable', price_cents: null },
+      handoff: salesUrl ? 'whatsapp' : 'login'
+    });
+
+    window.location.assign(salesUrl || '/login?intent=subscription');
+  };
+
   return (
     <main className="subscription-plans-page">
       <header className="subscription-plans-hero">
@@ -86,7 +100,19 @@ export default function SubscriptionPlansPage() {
       </header>
 
       {loading && <p className="subscription-plans-status">Carregando planos…</p>}
-      {error && <p className="subscription-plans-error">{error}</p>}
+      {error && (
+        <div className="subscription-plans-error" role="alert">
+          <p>{error}</p>
+          <button type="button" onClick={contactSales}>Falar com o comercial</button>
+        </div>
+      )}
+
+      {!loading && !error && plans.length === 0 && (
+        <div className="subscription-plans-error" role="status">
+          <p>Os planos estão temporariamente indisponíveis para consulta.</p>
+          <button type="button" onClick={contactSales}>Quero contratar o PayFlow</button>
+        </div>
+      )}
 
       <section className="subscription-plans-grid" aria-label="Planos PayFlow">
         {plans.map((plan) => (
